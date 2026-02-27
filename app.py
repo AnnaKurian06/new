@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from openai import OpenAI
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,7 +9,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # ── SERVE FRONTEND ──
 @app.route('/')
@@ -19,7 +19,7 @@ def index():
 # ── HELPER ──
 def ask_ai(system_prompt, user_prompt):
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="llama-3.3-70b-versatile",
         max_tokens=1500,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -27,6 +27,22 @@ def ask_ai(system_prompt, user_prompt):
         ]
     )
     return response.choices[0].message.content
+
+# ── PDF UPLOAD ──
+@app.route('/api/upload', methods=['POST'])
+def upload():
+    file = request.files.get('file')
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
+    try:
+        import PyPDF2
+        reader = PyPDF2.PdfReader(file)
+        text = ''
+        for page in reader.pages:
+            text += page.extract_text() or ''
+        return jsonify({"text": text})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ── SUMMARY ──
 @app.route('/api/summary', methods=['POST'])
@@ -128,4 +144,3 @@ Notes:
 
 if __name__ == '__main__':
     app.run(debug=True)
-

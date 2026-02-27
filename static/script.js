@@ -71,7 +71,7 @@ function handleFile(input) {
         };
         reader.readAsText(file);
     } else if (file.type === 'application/pdf') {
-        showToast('📄 PDF uploaded! Text will be extracted by the backend.');
+        showToast('📄 Extracting PDF text...');
         uploadPDF(file);
     }
 }
@@ -79,7 +79,6 @@ function handleFile(input) {
 async function uploadPDF(file) {
     const formData = new FormData();
     formData.append('file', file);
-
     try {
         const res = await fetch('/api/upload', {
             method: 'POST',
@@ -96,7 +95,7 @@ async function uploadPDF(file) {
     }
 }
 
-// Drag and drop
+// ── DRAG AND DROP ──
 const dropZone = document.getElementById('drop-zone');
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -176,10 +175,8 @@ async function generateSummary() {
             body: JSON.stringify({ notes, options })
         });
         const data = await res.json();
-
         document.getElementById('result-content-summary').innerHTML = formatResult(data.result);
         document.getElementById('result-summary').classList.add('show');
-
         stats.topics = Math.floor(Math.random() * 5) + 3;
         animateNum('stat-topics', stats.topics);
     } catch (e) {
@@ -210,13 +207,10 @@ async function generateMCQ() {
             body: JSON.stringify({ notes, count, difficulty })
         });
         const data = await res.json();
-
         const clean = data.result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         mcqData = JSON.parse(clean);
-
         stats.mcqs += mcqData.length;
         animateNum('stat-mcqs', stats.mcqs);
-
         renderMCQ(mcqData);
         document.getElementById('result-mcq').classList.add('show');
         document.getElementById('score-display').style.display = 'flex';
@@ -291,7 +285,6 @@ async function generateELI5() {
             body: JSON.stringify({ notes, concept })
         });
         const data = await res.json();
-
         document.getElementById('result-content-eli5').innerHTML = formatResult(data.result);
         document.getElementById('result-eli5').classList.add('show');
     } catch (e) {
@@ -315,10 +308,8 @@ async function generateBooster() {
             body: JSON.stringify({ notes })
         });
         const data = await res.json();
-
         const clean = data.result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const boosterData = JSON.parse(clean);
-
         renderBooster(boosterData);
         document.getElementById('result-booster').classList.add('show');
     } catch (e) {
@@ -408,10 +399,8 @@ async function sendDoubt() {
             body: JSON.stringify({ notes, question })
         });
         const data = await res.json();
-
         document.getElementById(thinkId)?.remove();
         addChatMessage('bot', data.result);
-
         stats.doubts++;
         animateNum('stat-doubts', stats.doubts);
     } catch (e) {
