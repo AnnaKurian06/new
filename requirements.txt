@@ -1,4 +1,6 @@
 flask
 flask-cors
 python-dotenv
-openai
+groq
+PyPDF2
+gunicorn

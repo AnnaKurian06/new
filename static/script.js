@@ -79,18 +79,29 @@ function handleFile(input) {
 async function uploadPDF(file) {
     const formData = new FormData();
     formData.append('file', file);
+
     try {
-        const res = await fetch('/api/upload', {
+        const res = await fetch('http://127.0.0.1:5000/api/extract', {
             method: 'POST',
             body: formData
         });
+
+        if (!res.ok) {
+            throw new Error("Server error");
+        }
+
         const data = await res.json();
+
         if (data.text) {
             document.getElementById('notes-text').value = data.text;
             updateNotesStats(data.text);
             showToast('✓ PDF text extracted!');
+        } else {
+            showToast('❌ No text returned from server');
         }
+
     } catch (e) {
+        console.error(e);
         showToast('❌ Failed to extract PDF text.');
     }
 }
