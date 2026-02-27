@@ -3,20 +3,27 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from groq import Groq
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader   # ✅ PDF reader import
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# 🔐 Load API key
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# ── SERVE FRONTEND ──
+# ─────────────────────────────────────────────
+# 🔹 SERVE FRONTEND
+# ─────────────────────────────────────────────
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# ── HELPER ──
+
+# ─────────────────────────────────────────────
+# 🔹 HELPER FUNCTION FOR AI CALLS
+# ─────────────────────────────────────────────
 def ask_ai(system_prompt, user_prompt):
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -28,23 +35,38 @@ def ask_ai(system_prompt, user_prompt):
     )
     return response.choices[0].message.content
 
-# ── PDF UPLOAD ──
-@app.route('/api/upload', methods=['POST'])
-def upload():
-    file = request.files.get('file')
-    if not file:
+
+# ─────────────────────────────────────────────
+# 🔹 PDF TEXT EXTRACTION
+# ─────────────────────────────────────────────
+@app.route('/api/extract', methods=['POST'])
+def extract_pdf():
+    if 'file' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files['file']
+
     try:
-        import PyPDF2
-        reader = PyPDF2.PdfReader(file)
-        text = ''
+        reader = PdfReader(file)
+        text = ""
+
         for page in reader.pages:
-            text += page.extract_text() or ''
+            text += page.extract_text() or ""
+
+        if text.strip() == "":
+            return jsonify({"error": "Could not extract text from PDF"}), 400
+
+        print("✅ PDF extracted successfully")
+
         return jsonify({"text": text})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── SUMMARY ──
+
+# ─────────────────────────────────────────────
+# 🔹 SUMMARY
+# ─────────────────────────────────────────────
 @app.route('/api/summary', methods=['POST'])
 def summary():
     data = request.json
@@ -62,7 +84,10 @@ Notes:
     result = ask_ai("You are an expert study assistant.", prompt)
     return jsonify({"result": result})
 
-# ── MCQ ──
+
+# ─────────────────────────────────────────────
+# 🔹 MCQ GENERATOR
+# ─────────────────────────────────────────────
 @app.route('/api/mcq', methods=['POST'])
 def mcq():
     data = request.json
@@ -87,7 +112,10 @@ Notes:
     result = ask_ai("You are an exam question creator. Return only valid JSON.", prompt)
     return jsonify({"result": result})
 
-# ── ELI5 ──
+
+# ─────────────────────────────────────────────
+# 🔹 ELI5 EXPLAINER
+# ─────────────────────────────────────────────
 @app.route('/api/eli5', methods=['POST'])
 def eli5():
     data = request.json
@@ -102,7 +130,10 @@ Base the explanation on these notes if relevant:
     result = ask_ai("You are a friendly teacher who explains things simply.", prompt)
     return jsonify({"result": result})
 
-# ── EXAM BOOSTER ──
+
+# ─────────────────────────────────────────────
+# 🔹 EXAM BOOSTER
+# ─────────────────────────────────────────────
 @app.route('/api/booster', methods=['POST'])
 def booster():
     data = request.json
@@ -124,7 +155,10 @@ Notes:
     result = ask_ai("You are an expert exam coach. Return only valid JSON.", prompt)
     return jsonify({"result": result})
 
-# ── DOUBT SOLVER ──
+
+# ─────────────────────────────────────────────
+# 🔹 DOUBT SOLVER
+# ─────────────────────────────────────────────
 @app.route('/api/doubt', methods=['POST'])
 def doubt():
     data = request.json
@@ -142,5 +176,9 @@ Notes:
     result = ask_ai("You are a helpful study tutor. Answer based on the student's notes.", prompt)
     return jsonify({"result": result})
 
+
+# ─────────────────────────────────────────────
+# 🔹 RUN APP
+# ─────────────────────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True)
