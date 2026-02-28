@@ -117,7 +117,9 @@ Response:
 {
   "text": "Extracted text from the uploaded PDF..."
 }
-POST /api/mcq
+
+
+##POST /api/mcq
 
 Description: Generates multiple-choice questions (MCQs) from the notes.
 Request Body:
