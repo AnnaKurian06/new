@@ -76,7 +76,7 @@ Students can ask questions directly from their notes and receive clear AI-genera
 
 #### Installation
 # Clone the repository
-git clone https://github.com/AnnaKurian06/studysageai.git
+git clone https://github.com/AnnaKurian06/new.git
 
 # Move into the project folder
 cd studysageai
