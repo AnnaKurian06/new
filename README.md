@@ -97,46 +97,36 @@ py app.py
 
 ## Additional Documentation
 
-### For Web Projects with Backend:
+Additional Documentation
+For Web Projects with Backend:
+API Documentation
 
-#### API Documentation
+Base URL:
 
-**Base URL:** `https://api.yourproject.com`
+https://studysageai-2.onrender.com
 
 ##### Endpoints
 
-**GET /api/endpoint**
-- **Description:** [What it does]
-- **Parameters:**
-  - `param1` (string): [Description]
-  - `param2` (integer): [Description]
-- **Response:**
-```json
+##POST /api/upload
+
+Description: Uploads a PDF file and extracts readable text from it.
+Request Type: multipart/form-data
+Request Body:
+file (PDF): The file to be uploaded
+Response:
 {
-  "status": "success",
-  "data": {}
+  "text": "Extracted text from the uploaded PDF..."
 }
-```
+POST /api/mcq
 
-**POST /api/endpoint**
-- **Description:** [What it does]
-- **Request Body:**
-```json
+Description: Generates multiple-choice questions (MCQs) from the notes.
+Request Body:
 {
-  "field1": "value1",
-  "field2": "value2"
+  "notes": "Your notes text",
+  "count": 5,
+  "difficulty": "medium"
 }
-```
-- **Response:**
-```json
+Response:
 {
-  "status": "success",
-  "message": "Operation completed"
+  "result": "[JSON string containing MCQ objects]"
 }
-```
-
-[Add more endpoints as needed...]
-
----
-
-
