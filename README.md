@@ -26,9 +26,7 @@ It significantly reduces manual study effort and improves learning efficiency.
 
 ## 🌐 Live Demo
 
-- 🔗 Frontend: https://study-sage-ai.vercel.app  
-- 🔗 Backend API: https://studysageai-2.onrender.com  
-
+- https://studysage-ai.onrender.com
 ---
 
 ## 📌 Problem Statement
