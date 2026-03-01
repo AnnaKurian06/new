@@ -149,18 +149,22 @@ git clone https://github.com/AnnaKurian06/new.git
 # Move into the project folder
 cd studysageai
 
-# Create virtual environment (recommended)
+Create virtual environment (recommended)
 python -m venv venv
 
 # Activate virtual environment
-# Windows
+#Windows
 venv\Scripts\activate
-# Mac/Linux
+
+
+#Mac/Linux
 source venv/bin/activate
 
-# Install required dependencies
+Install required dependencies
 pip install -r requirements.txt
-#### Run
+
+
+Run
 py app.py
 
 ## Additional Documentation
