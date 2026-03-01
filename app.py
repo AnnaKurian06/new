@@ -36,9 +36,8 @@ def ask_ai(system_prompt, user_prompt):
     return response.choices[0].message.content
 
 
-# ─────────────────────────────────────────────
+
 # 🔹 PDF TEXT EXTRACTION
-# ─────────────────────────────────────────────
 @app.route('/api/extract', methods=['POST'])
 def extract_pdf():
     if 'file' not in request.files:
@@ -47,23 +46,33 @@ def extract_pdf():
     file = request.files['file']
 
     try:
-        reader = PdfReader(file)
+        from PyPDF2 import PdfReader
+
+        # IMPORTANT: use file.stream instead of file
+        reader = PdfReader(file.stream)
+
         text = ""
 
-        for page in reader.pages:
-            text += page.extract_text() or ""
+        for i, page in enumerate(reader.pages):
+            try:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+                else:
+                    print(f"⚠️ No text found on page {i}")
+            except Exception as e:
+                print(f"❌ Error on page {i}: {e}")
 
-        if text.strip() == "":
-            return jsonify({"error": "Could not extract text from PDF"}), 400
+        if len(text.strip()) < 20:
+            return jsonify({"error": "No readable text found in PDF"}), 400
 
-        print("✅ PDF extracted successfully")
-
-        return jsonify({"text": text})
+        return jsonify({
+    "text_length": len(text),
+    "preview": text[:200]
+})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 # ─────────────────────────────────────────────
 # 🔹 SUMMARY
 # ─────────────────────────────────────────────
@@ -181,4 +190,5 @@ Notes:
 # 🔹 RUN APP
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
