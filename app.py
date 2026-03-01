@@ -1,9 +1,10 @@
 import os
+import io
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from groq import Groq
 from dotenv import load_dotenv
-from PyPDF2 import PdfReader   # ✅ PDF reader import
+from PyPDF2 import PdfReader
 
 load_dotenv()
 
@@ -36,8 +37,9 @@ def ask_ai(system_prompt, user_prompt):
     return response.choices[0].message.content
 
 
-
-# 🔹 PDF TEXT EXTRACTION
+# ─────────────────────────────────────────────
+# 🔹 PDF TEXT EXTRACTION (FIXED)
+# ─────────────────────────────────────────────
 @app.route('/api/extract', methods=['POST'])
 def extract_pdf():
     if 'file' not in request.files:
@@ -46,10 +48,11 @@ def extract_pdf():
     file = request.files['file']
 
     try:
-        from PyPDF2 import PdfReader
+        # ✅ Render-safe file handling
+        pdf_bytes = file.read()
+        pdf_stream = io.BytesIO(pdf_bytes)
 
-        # IMPORTANT: use file.stream instead of file
-        reader = PdfReader(file.stream)
+        reader = PdfReader(pdf_stream)
 
         text = ""
 
@@ -59,20 +62,28 @@ def extract_pdf():
                 if page_text:
                     text += page_text + "\n"
                 else:
-                    print(f"⚠️ No text found on page {i}")
+                    print(f"⚠️ No text on page {i}")
             except Exception as e:
-                print(f"❌ Error on page {i}: {e}")
+                print(f"❌ Error reading page {i}: {e}")
 
-        if len(text.strip()) < 20:
-            return jsonify({"error": "No readable text found in PDF"}), 400
+        # ❌ If no text extracted
+        if len(text.strip()) == 0:
+            return jsonify({
+                "error": "No readable text found in PDF",
+                "text": ""
+            }), 400
 
+        # ✅ SUCCESS RESPONSE
         return jsonify({
-    "text_length": len(text),
-    "preview": text[:200]
-})
+            "text": text,
+            "text_length": len(text),
+            "preview": text[:200]
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 # ─────────────────────────────────────────────
 # 🔹 SUMMARY
 # ─────────────────────────────────────────────
