@@ -142,65 +142,223 @@ Ask questions directly from your notes and receive AI-powered answers.
 
 ### For Software:
 
-#### Installation
-# Clone the repository
+# 🚀 Installation & Setup
+
+## 📦 Clone the Repository
+```bash
 git clone https://github.com/AnnaKurian06/new.git
-
-# Move into the project folder
 cd studysageai
+```
 
-Create virtual environment (recommended)
+## 🧪 Create & Activate Virtual Environment
+
+```bash
 python -m venv venv
+```
 
-# Activate virtual environment
-#Windows
+### ▶ Activate Environment
+
+**Windows**
+```bash
 venv\Scripts\activate
+```
 
-
-#Mac/Linux
+**Mac / Linux**
+```bash
 source venv/bin/activate
+```
 
-Install required dependencies
+## 📥 Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
+## ▶ Run the Application (Local Development)
+```bash
+python app.py
+```
 
-Run
-py app.py
+---
 
-## Additional Documentation
+# 🌐 Deployed Application
 
-Additional Documentation
-For Web Projects with Backend:
-API Documentation
+**Backend (Render):**  
+https://studysage-ai.onrender.com/
 
-Base URL:
+**Frontend (Vercel):**  
+study-sage-ai.vercel.app
 
-https://studysageai-2.onrender.com
+---
 
-##### Endpoints
+# 📡 API Documentation
 
-##POST /api/upload
+### 🔗 Base URL
+```
+https://studysage-ai.onrender.com/
+```
 
-Description: Uploads a PDF file and extracts readable text from it.
-Request Type: multipart/form-data
-Request Body:
-file (PDF): The file to be uploaded
-Response:
+---
+
+## 📄 1. Extract Text from PDF
+
+### Endpoint
+```
+POST /api/extract
+```
+
+### Description
+Uploads a PDF file and extracts readable text from it.
+
+### Request Type
+`multipart/form-data`
+
+### Request Body
+| Field | Type | Description |
+|------|------|------------|
+| file | PDF | The PDF file to upload |
+
+### Response
+```json
 {
-  "text": "Extracted text from the uploaded PDF..."
+  "text": "Extracted text from the uploaded PDF...",
+  "text_length": 1250,
+  "preview": "First few lines of the document..."
 }
+```
 
+---
 
-##POST /api/mcq
+## 🧠 2. Generate Summary
 
-Description: Generates multiple-choice questions (MCQs) from the notes.
-Request Body:
+### Endpoint
+```
+POST /api/summary
+```
+
+### Request Body
+```json
+{
+  "notes": "Your notes text",
+  "options": {
+    "bullets": true,
+    "defs": true,
+    "short": false
+  }
+}
+```
+
+### Response
+```json
+{
+  "result": "Formatted summary text..."
+}
+```
+
+---
+
+## ❓ 3. Generate MCQs
+
+### Endpoint
+```
+POST /api/mcq
+```
+
+### Request Body
+```json
 {
   "notes": "Your notes text",
   "count": 5,
   "difficulty": "medium"
 }
-Response:
+```
+
+### Response
+```json
 {
   "result": "[JSON string containing MCQ objects]"
 }
+```
+
+---
+
+## 👶 4. ELI5 Explanation
+
+### Endpoint
+```
+POST /api/eli5
+```
+
+### Request Body
+```json
+{
+  "notes": "Your notes text",
+  "concept": "Photosynthesis"
+}
+```
+
+### Response
+```json
+{
+  "result": "Simple explanation..."
+}
+```
+
+---
+
+## ⚡ 5. Exam Booster
+
+### Endpoint
+```
+POST /api/booster
+```
+
+### Response
+```json
+{
+  "result": "{ JSON object with hot topics, questions, revision points }"
+}
+```
+
+---
+
+## 💬 6. Doubt Solver
+
+### Endpoint
+```
+POST /api/doubt
+```
+
+### Request Body
+```json
+{
+  "notes": "Your notes text",
+  "question": "Explain Calvin cycle"
+}
+```
+
+### Response
+```json
+{
+  "result": "Answer based on notes..."
+}
+```
+
+---
+
+# 🧩 Deployment Notes (Render)
+
+### Build Command
+```bash
+pip install -r requirements.txt
+```
+
+### Start Command
+```bash
+gunicorn app:app
+```
+
+
+
+# 🎯 Project Summary
+
+StudySageAI is an AI-powered study assistant that converts PDF notes into structured summaries, MCQs, ELI5 explanations, and exam-focused revision material — helping students learn faster and prepare smarter.
